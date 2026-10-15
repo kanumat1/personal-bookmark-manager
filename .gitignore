@@ -1,0 +1,5 @@
+bin/
+obj/
+bookmarks.json
+*.tmp
+.vs/

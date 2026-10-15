@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bookmark Manager</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main>
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">PERSONAL TOOL</p>
+        <h1>🔖 Bookmark Manager</h1>
+        <p class="subtitle">Save, organize and quickly find your bookmarks.</p>
+      </div>
+    </header>
+
+    <nav class="tabs" aria-label="Bookmark actions">
+      <button class="tab-button active" type="button" data-tab="add" aria-selected="true">＋ Add</button>
+      <button class="tab-button" type="button" data-tab="edit" aria-selected="false">✎ Edit</button>
+      <button class="tab-button" type="button" data-tab="delete" aria-selected="false">🗑 Delete</button>
+      <button class="tab-button" type="button" data-tab="search" aria-selected="false">⌕ Search &amp; Filter</button>
+    </nav>
+
+    <section class="tab-panel active" data-panel="add" aria-labelledby="add-tab-heading">
+      <div class="panel-heading">
+        <div>
+          <p class="section-kicker">CREATE</p>
+          <h2 id="add-tab-heading">Add a bookmark</h2>
+          <p>Save a URL and optionally add a title and tags.</p>
+        </div>
+      </div>
+
+      <form id="add-form" novalidate>
+        <div class="field">
+          <label for="url">URL <span class="required">*</span></label>
+          <input type="text" id="url" name="url" placeholder="https://example.com" required />
+        </div>
+        <div class="field">
+          <label for="title">Title <span class="optional">Optional</span></label>
+          <input type="text" id="title" name="title" placeholder="Leave blank to fetch the page title" />
+        </div>
+        <div class="field">
+          <label for="tags">Tags <span class="optional">Optional</span></label>
+          <input type="text" id="tags" name="tags" placeholder="work, reference, learning" />
+          <span class="hint">Separate multiple tags with commas.</span>
+        </div>
+        <div class="form-actions">
+          <button class="primary" type="submit" id="save-button">Add Bookmark</button>
+          <button class="secondary" type="button" id="cancel-edit-button" hidden>Cancel</button>
+        </div>
+      </form>
+      <p id="form-message" class="status-message" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="tab-panel" data-panel="edit" aria-labelledby="edit-tab-heading" hidden>
+      <div class="panel-heading">
+        <div>
+          <p class="section-kicker">UPDATE</p>
+          <h2 id="edit-tab-heading">Edit a bookmark</h2>
+          <p>Choose a bookmark, make your changes, and save.</p>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="edit-bookmark-select">Select bookmark</label>
+        <select id="edit-bookmark-select"></select>
+      </div>
+      <form id="edit-form" novalidate>
+        <div class="field">
+          <label for="edit-url">URL <span class="required">*</span></label>
+          <input type="text" id="edit-url" required />
+        </div>
+        <div class="field">
+          <label for="edit-title">Title</label>
+          <input type="text" id="edit-title" required />
+        </div>
+        <div class="field">
+          <label for="edit-tags">Tags <span class="optional">Optional</span></label>
+          <input type="text" id="edit-tags" placeholder="work, reference" />
+        </div>
+        <div class="form-actions">
+          <button class="primary" type="submit" id="save-edit-button">Save Changes</button>
+        </div>
+      </form>
+      <p id="edit-message" class="status-message" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="tab-panel" data-panel="delete" aria-labelledby="delete-tab-heading" hidden>
+      <div class="panel-heading">
+        <div>
+          <p class="section-kicker danger-kicker">REMOVE</p>
+          <h2 id="delete-tab-heading">Delete a bookmark</h2>
+          <p>Choose a bookmark to permanently remove it.</p>
+        </div>
+      </div>
+
+      <div class="warning-box">
+        <strong>⚠ Delete is permanent.</strong>
+        <span>You will be asked to confirm before anything is removed.</span>
+      </div>
+      <div class="field">
+        <label for="delete-bookmark-select">Select bookmark</label>
+        <select id="delete-bookmark-select"></select>
+      </div>
+      <div class="form-actions">
+        <button class="danger-button" type="button" id="open-delete-button">Delete Bookmark</button>
+      </div>
+      <p id="delete-message" class="status-message" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="tab-panel search-panel" data-panel="search" aria-labelledby="search-tab-heading" hidden>
+      <div class="panel-heading">
+        <div>
+          <p class="section-kicker">BROWSE</p>
+          <h2 id="search-tab-heading">Search &amp; Filter</h2>
+          <p>Find bookmarks by title or URL, then narrow them by tag.</p>
+        </div>
+        <span id="bookmark-count" class="count-badge">0 bookmarks</span>
+      </div>
+
+      <div class="search-toolbar">
+        <div class="field search-field">
+          <label for="search-box">Search by title or URL</label>
+          <input type="search" id="search-box" placeholder="Search bookmarks…" />
+        </div>
+        <div class="field filter-field">
+          <label for="tag-filter">Filter by tag</label>
+          <select id="tag-filter">
+            <option value="">All tags</option>
+            <option value="__untagged__">Untagged</option>
+          </select>
+        </div>
+      </div>
+
+      <p id="list-message" class="empty-state" role="status" aria-live="polite"></p>
+      <ul id="bookmark-list"></ul>
+    </section>
+  </main>
+
+  <dialog id="delete-dialog">
+    <div class="dialog-icon">🗑</div>
+    <h2>Delete bookmark?</h2>
+    <p id="delete-dialog-message"></p>
+    <div class="dialog-actions">
+      <button class="secondary" type="button" id="delete-cancel-button">Cancel</button>
+      <button class="danger-button" type="button" id="delete-confirm-button">Delete</button>
+    </div>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
